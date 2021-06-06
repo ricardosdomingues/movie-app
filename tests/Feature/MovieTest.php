@@ -71,7 +71,7 @@ class MovieTest extends TestCase
     }
     
     /** @test */
-    function user_can_view_their_movies()
+    function user_can_only_view_their_movies()
     {
         $user = User::factory()->create();
 
