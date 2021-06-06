@@ -1,14 +1,17 @@
 <?php
 
-namespace Tests\Unit\Lead;
+namespace Tests\Unit;
 
 use Tests\TestCase;
-use App\Models\Movie;
 use App\Models\User;
+use App\Models\Movie;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MovieTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /** @test */
     public function a_movie_has_an_user()
     {

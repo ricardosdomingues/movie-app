@@ -1,12 +1,17 @@
 <?php
 
-namespace Tests\Feature\Questions;
+namespace Tests\Feature;
 
+use App\Models\Genre;
 use Tests\TestCase;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class MovieTest extends TestCase
 {
+    use RefreshDatabase;
+    
     /** @test */
     function guests_can_not_get_their_movies()
     {
@@ -38,6 +43,60 @@ class MovieTest extends TestCase
                     ]
                 ]
             ]);
+    }
+
+    /** @test */
+    function release_date_cannot_be_in_the_future()
+    {
+        $user = User::factory()->create();
+
+        $genres = Genre::factory(2)->create();
+        
+        $this->actingAs($user);
+
+        $data = array(
+            'title'        => 'Title',
+            'description'  => 'Description',
+            'genres'       => $genres->map(function ($genre) { return $genre->id; })->toArray(),
+            'release_date' => Carbon::tomorrow()->toDateString(),
+            'watched'      => false
+        );
+
+        $this->postJson('/movies', $data)
+            ->assertStatus(422)
+            ->assertExactJson([
+                'errors' => [
+                    'release_date' => ["The release date must be a date before today."]
+                ],
+                'message' => 'The given data was invalid.'
+            ]);
+
+    }
+
+    /** @test */
+    function genres_must_exist()
+    {
+        $user = User::factory()->create();
+        
+        $this->actingAs($user);
+
+        $data = array(
+            'title'        => 'Title',
+            'description'  => 'Description',
+            'genres'       => [1],
+            'release_date' => Carbon::yesterday()->toDateString(),
+            'watched'      => false
+        );
+
+        $this->postJson('/movies', $data)
+            ->assertStatus(422)
+            ->assertExactJson([
+                'errors' => [
+                    'genres' => [["The selected genres.0 is invalid."]]
+                ],
+                'message' => 'The given data was invalid.'
+            ]);
+
     }
 
     /** @test */

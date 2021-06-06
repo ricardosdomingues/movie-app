@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use App\Models\Movie;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MovieFactory extends Factory
@@ -22,8 +22,10 @@ class MovieFactory extends Factory
      */
     public function definition()
     {
+        $user = User::factory()->create();
+
         return [
-            'user_id'          => 1,
+            'user_id'          => $user->id,
             'title'            => $this->faker->name(),
             'description'      => $this->faker->sentence(5),
             'release_date'     => $this->faker->date(),
